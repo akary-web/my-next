@@ -1,7 +1,7 @@
 "use client";  // クライアントサイド実行指定
 
 import React, { useState, useEffect } from 'react';
-import styles from '../app/_styles/postsList.module.css';
+import styles from './postsList.module.css';
 import Link from 'next/link'; // react-router-domから変更
 
 // APIデータの型定義

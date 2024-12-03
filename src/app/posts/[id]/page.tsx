@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';  // 修正点
-import styles from '../../_styles/postsDetail.module.css';
+import styles from './postsDetail.module.css';
 import Image from 'next/image';
 
 // 投稿の詳細データの型を定義

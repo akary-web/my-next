@@ -1,7 +1,7 @@
 "use client";
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import styles from "../_styles/contactForm.module.css";
+import styles from "./contactForm.module.css";
 
 // フォームの入力データの型を定義
 interface IFormInput {

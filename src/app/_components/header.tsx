@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { nav } from '../_data/navList';
-import styles from '../_styles/header.module.css';
+import styles from './header.module.css';
 import Link from 'next/link';
 
 export const Header: React.FC = () => {
