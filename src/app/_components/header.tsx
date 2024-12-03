@@ -1,5 +1,4 @@
 "use client";  // クライアントサイドで実行
-
 import React from 'react';
 import { nav } from '../_data/navList';
 import styles from './header.module.css';
