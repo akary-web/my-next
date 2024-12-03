@@ -1,95 +1,69 @@
-import Image from "next/image";
-import styles from "./page.module.css";
+"use client";  // クライアントサイド実行指定
 
-export default function Home() {
-  return (
-    <main className={styles.main}>
-      <div className={styles.description}>
-        <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>src/app/page.tsx</code>
-        </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{" "}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
-            />
-          </a>
-        </div>
-      </div>
+import React, { useState, useEffect } from 'react';
+import styles from '../app/_styles/postsList.module.css';
+import Link from 'next/link'; // react-router-domから変更
 
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  );
+// APIデータの型定義
+interface Post {
+  id: number;
+  title: string;
+  createdAt: string; // 日付はISO文字列
+  categories: string[]; // カテゴリは文字列配列
+  content: string;
 }
+const Home: React.FC = () => {
+  // useStateに型を追加
+  const [posts, setPosts] = useState<Post[]>([]); // 初期値は空配列
+  const [isLoading, setIsLoading] = useState<boolean>(true); // boolean型
+
+  useEffect(() => {
+    const fetcher = async () => {
+      setIsLoading(true);
+
+      try {
+        const res = await fetch("https://1hmfpsvto6.execute-api.ap-northeast-1.amazonaws.com/dev/posts");
+        const data = await res.json();
+        setPosts(data.posts)
+      } catch (error) {
+        console.error("データの取得に失敗しました:", error);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetcher();
+  }, []);
+
+
+  if (isLoading) {
+    return <div>・・・読み込み中です・・・</div>;
+  }
+
+  if (posts.length === 0) {
+    return <div>投稿が見つかりませんでした。</div>;
+  }
+
+  return (
+    <div className={styles.post_container}>
+      {posts.map((post) => (
+        <Link href={`/posts/${post.id}`} key={post.id}>
+          <div className={styles.post_list}>
+            <div className={styles.post_info}>
+              <p className={styles.post_date}>{new Date(post.createdAt).toLocaleDateString()}</p>
+              <ul className={styles.post_cate}>
+                {post.categories.map((cate, index) => (
+                  <li className={styles.cate_item} key={index}>{cate}</li>
+                ))}
+              </ul>
+            </div>
+            <h2 className={styles.post_title}>{post.title}</h2>
+            <div dangerouslySetInnerHTML={{ __html: post.content }} />
+          </div>
+        </Link>
+      ))}
+    </div>
+  );
+};
+
+export default Home;
