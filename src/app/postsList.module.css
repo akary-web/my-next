@@ -1,0 +1,42 @@
+.post_container {
+  margin: 40px auto;
+  max-width: 800px;
+  padding: 0 1rem;
+}
+
+.post_list{
+  border: 1px solid #ccc;
+  margin-bottom: 2rem;
+  padding: 1rem;
+}
+
+.post_info {
+  display: flex;
+  justify-content: space-between;
+}
+
+.post_date {
+  color: #888;
+  font-size: 0.8rem;
+}
+
+.post_cate {
+  display: flex;
+  justify-content: flex-end;
+}
+
+.cate_item {
+  border: 1px solid #06c;
+  border-radius: .2rem;
+  color: #06c;
+  font-size: .8rem;
+  margin-right: .5rem;
+  padding: .2rem .4rem;
+}
+
+.post_title {
+  font-size: 1.5rem;
+  margin-bottom: 1rem;
+  margin-top: .5rem;
+}
+
