@@ -1,7 +1,6 @@
 "use client";
 import React from "react";
 import { useForm, SubmitHandler } from "react-hook-form";
-import styles from "./contactForm.module.css";
 
 // フォームの入力データの型を定義
 interface IFormInput {
@@ -41,12 +40,12 @@ const ContactForm: React.FC = () => {
   };
 
   return (
-    <form className={styles.wrap} onSubmit={handleSubmit(onSubmit)}>
-      <h1 className={styles.title}>問合わせフォーム</h1>
-      <div className={styles.itemwrap}>
-        <label className={styles.itemlabel}>お名前</label>
-        <div className={styles.textwrap}>
-          <input className={styles.input}
+    <form className="py-10 max-w-3xl mx-auto" onSubmit={handleSubmit(onSubmit)}>
+      <h1 className="text-xl font-bold leading-relaxed mb-10">問合わせフォーム</h1>
+      <div className="flex items-center justify-between mb-6">
+        <label className="w-[240px]">お名前</label>
+        <div className="w-full">
+          <input className="w-full p-4 border border-gray-300 rounded-lg"
             type="text"
             {...register("name", {
               required: "お名前は必須です。",
@@ -57,14 +56,14 @@ const ContactForm: React.FC = () => {
             })}
             disabled={isSubmitting}
           />
-          {errors.name && <p className={styles.error}>{errors.name.message}</p>}
+          {errors.name && <p className="text-red-700 text-sm">{errors.name.message}</p>}
         </div>
       </div>
 
-      <div className={styles.itemwrap}>
-        <label className={styles.itemlabel}>メールアドレス</label>
-        <div className={styles.textwrap}>
-          <input className={styles.input}
+      <div className="flex items-center justify-between mb-6">
+        <label className="w-[240px]">メールアドレス</label>
+        <div className="w-full">
+          <input className="w-full p-4 border border-gray-300 rounded-lg"
             type="email"
             {...register("email", {
               required: "メールアドレスは必須です。",
@@ -75,14 +74,14 @@ const ContactForm: React.FC = () => {
             })}
             disabled={isSubmitting}
           />
-          {errors.email && <p className={styles.error}>{errors.email.message}</p>}
+          {errors.email && <p className="text-red-700 text-sm">{errors.email.message}</p>}
         </div>
       </div>
 
-      <div className={styles.itemwrap}>
-        <label className={styles.itemlabel}>本文</label>
-        <div className={styles.textwrap}>
-          <textarea className={styles.input} rows={8}
+      <div className="flex items-center justify-between mb-6">
+        <label className="w-[240px]">本文</label>
+        <div className="w-full">
+          <textarea className="w-full p-4 border border-gray-300 rounded-lg" rows={8}
             {...register("message", {
               required: "本文は必須です。",
               maxLength: {
@@ -92,15 +91,15 @@ const ContactForm: React.FC = () => {
             })}
             disabled={isSubmitting}
           />
-          {errors.message && <p className={styles.error}>{errors.message.message}</p>}
+          {errors.message && <p className="text-red-700 text-sm">{errors.message.message}</p>}
         </div>
       </div>
 
-      <div className={styles.buttonwrap}>
-        <button className={styles.send} type="submit" disabled={isSubmitting}>
+      <div className="flex justify-center">
+        <button className="py-2 px-4 rounded-lg font-bold text-white bg-gray-800 mr-4" type="submit" disabled={isSubmitting}>
           {isSubmitting ? "送信中" : "送信"}
         </button>
-        <button className={styles.clear} type="button" onClick={() => reset()} disabled={isSubmitting}>
+        <button className="py-2 px-4 rounded-lg font-bold  bg-gray-300" type="button" onClick={() => reset()} disabled={isSubmitting}>
           クリア
         </button>
       </div>
