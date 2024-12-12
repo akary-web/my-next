@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import "./destyle.css";
+import "./global.css";
 import { Header } from "./_components/Header";
 
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "8章課題",
-  description: "8章課題",
+  title: "10章課題",
+  description: "10章課題",
 };
 
 export default function RootLayout({
