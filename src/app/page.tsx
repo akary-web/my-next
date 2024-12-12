@@ -5,38 +5,11 @@ import styles from './postsList.module.css';
 import Link from 'next/link'; // react-router-domから変更
 import { MicroCmsPost } from './_types/MicrCmsPost';
 
-// APIデータの型定義
-// interface Post {
-//   id: number;
-//   title: string;
-//   createdAt: string; // 日付はISO文字列
-//   categories: string[]; // カテゴリは文字列配列
-//   content: string;
-// }
-//移動
 
 const Home: React.FC = () => {
   // useStateに型を追加
   const [posts, setPosts] = useState<MicroCmsPost[]>([]); // 初期値は空配列
   const [isLoading, setIsLoading] = useState<boolean>(false); // boolean型
-
-  // useEffect(() => {
-  //   const fetcher = async () => {
-  //     setIsLoading(true);
-
-  //     try {
-  //       const res = await fetch("https://1hmfpsvto6.execute-api.ap-northeast-1.amazonaws.com/dev/posts");
-  //       const data = await res.json();
-  //       setPosts(data.posts)
-  //     } catch (error) {
-  //       console.error("データの取得に失敗しました:", error);
-  //     } finally {
-  //       setIsLoading(false);
-  //     }
-  //   };
-
-  //   fetcher();
-  // }, []);
 
   useEffect(() => {
     const fetcher = async () => {
