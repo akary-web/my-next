@@ -1,107 +1,143 @@
 import React from "react";
-import { useRouter } from "next/navigation";
+import { Controller, UseFormReturn } from "react-hook-form";
 import { Category } from "@/app/_types/Categories";
 import { CategoriesSelect } from "./CategoriesSelect";
 
 interface Props {
   mode: "new" | "edit";
-  title: string;
-  setTitle: (title: string) => void;
-  content: string;
-  setContent: (content: string) => void;
-  thumbnailUrl: string;
-  setThumbnailUrl: (thumbnailUrl: string) => void;
+  control: UseFormReturn["control"]; // react-hook-formのcontrol
   categories: Category[];
-  setCategories: (categories: Category[]) => void;
   onSubmit: (e: React.FormEvent) => void;
   onDelete?: () => void;
 }
 
 export const PostForm: React.FC<Props> = ({
   mode,
-  title,
-  setTitle,
-  content,
-  setContent,
-  thumbnailUrl,
-  setThumbnailUrl,
+  control,
   categories,
-  setCategories,
   onSubmit,
   onDelete,
 }) => {
-  const router = useRouter();
-
   return (
-    <form onSubmit={onSubmit} className="spece-y-4">
+    <form onSubmit={onSubmit} className="space-y-4">
+      {/* タイトル */}
       <div className="mt-4">
-        <label
-          htmlFor="title"
-          className="block text-sm font-bold text-gray-700"
-        >
-          タイトル
+        <label htmlFor="title" className="block text-sm text-gray-700">
+          タイトル <span className="text-red-500">*</span>
         </label>
-        <input
-          type="text"
-          id="title"
-          value={title}
-          onChange={(e) => setTitle(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-gray-200 p-3"
+        <Controller
+          name="title"
+          control={control}
+          rules={{ required: "タイトルは必須です" }} // 必須バリデーション
+          render={({ field, fieldState }) => (
+            <>
+              <input
+                {...field}
+                id="title"
+                className={`mt-1 block w-full rounded-md border ${
+                  fieldState.error ? "border-red-500" : "border-gray-200"
+                } p-3`}
+              />
+              {fieldState.error && (
+                <p className="text-red-500 text-sm mt-1">{fieldState.error.message}</p>
+              )}
+            </>
+          )}
         />
       </div>
+
+      {/* 内容 */}
       <div className="mt-4">
-        <label
-          htmlFor="content"
-          className="block text-sm font-bold text-gray-700"
-        >
-          内容
+        <label htmlFor="content" className="block text-sm text-gray-700">
+          内容 <span className="text-red-500">*</span>
         </label>
-        <textarea
-          id="content"
-          value={content}
-          onChange={(e) => setContent(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-gray-200 p-3"
+        <Controller
+          name="content"
+          control={control}
+          rules={{ required: "内容は必須です" }} // 必須バリデーション
+          render={({ field, fieldState }) => (
+            <>
+              <textarea
+                {...field}
+                id="content"
+                className={`mt-1 block w-full rounded-md border ${
+                  fieldState.error ? "border-red-500" : "border-gray-200"
+                } p-3`}
+              />
+              {fieldState.error && (
+                <p className="text-red-500 text-sm mt-1">{fieldState.error.message}</p>
+              )}
+            </>
+          )}
         />
       </div>
+
+      {/* サムネイルURL */}
       <div className="mt-4">
-        <label
-          htmlFor="thumbnailUrl"
-          className="block text-sm font-bold text-gray-700"
-        >
-          サムネイルURL
+        <label htmlFor="thumbnailUrl" className="block text-sm text-gray-700">
+          サムネイルURL <span className="text-red-500">*</span>
         </label>
-        <input
-          type="text"
-          id="thumbnailUrl"
-          value={thumbnailUrl}
-          onChange={(e) => setThumbnailUrl(e.target.value)}
-          className="mt-1 block w-full rounded-md border border-gray-200 p-3"
+        <Controller
+          name="thumbnailUrl"
+          control={control}
+          rules={{ required: "サムネイルURLは必須です" }} // 必須バリデーション
+          render={({ field, fieldState }) => (
+            <>
+              <input
+                {...field}
+                id="thumbnailUrl"
+                className={`mt-1 block w-full rounded-md border ${
+                  fieldState.error ? "border-red-500" : "border-gray-200"
+                } p-3`}
+              />
+              {fieldState.error && (
+                <p className="text-red-500 text-sm mt-1">{fieldState.error.message}</p>
+              )}
+            </>
+          )}
         />
       </div>
+
+      {/* カテゴリー */}
       <div className="mt-4">
-        <label
-          htmlFor="thumbnailUrl"
-          className="block text-sm font-bold text-gray-700"
-        >
-          カテゴリー
+        <label htmlFor="categories" className="block text-sm text-gray-700">
+          カテゴリー <span className="text-red-500">*</span>
         </label>
-        <CategoriesSelect
-          selectedCategories={categories}
-          setSelectedCategories={setCategories}
+        <Controller
+          name="categories"
+          control={control}
+          rules={{
+            validate: (value) =>
+              value.length > 0 || "少なくとも1つのカテゴリーを選択してください",
+          }} // カスタムバリデーション
+          render={({ field, fieldState }) => (
+            <>
+              <CategoriesSelect
+                selectedCategories={field.value}
+                setSelectedCategories={field.onChange}
+                categories={categories}
+              />
+              {fieldState.error && (
+                <p className="text-red-500 text-sm mt-1">{fieldState.error.message}</p>
+              )}
+            </>
+          )}
         />
       </div>
+
+      {/* ボタン */}
       <div className="flex justify-between">
         <div className="flex">
           <button
             type="submit"
-            className="shadow-md bg-blue-500 hover:bg-blue-400 text-white rounded px-4 py-2 mt-4"
+            className="shadow-md bg-blue-400 hover:bg-blue-600 text-white rounded px-4 py-2 mt-4"
           >
             {mode === "new" ? "作成" : "更新"}
           </button>
-          {mode === "edit" && (
+          {mode === "edit" && onDelete && (
             <button
               type="button"
-              className="shadow-md bg-red-500 hover:bg-red-400 text-white rounded px-4 py-2 mt-4 ml-2"
+              className="shadow-md bg-red-400 hover:bg-red-600 text-white rounded px-4 py-2 mt-4 ml-2"
               onClick={onDelete}
             >
               削除

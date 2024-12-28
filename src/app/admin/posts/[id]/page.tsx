@@ -5,25 +5,34 @@ import { useParams, useRouter } from "next/navigation";
 import { PostForm } from "@/app/admin/posts/_components/PostForm";
 import { Category } from "@/app/_types/Categories";
 import { Post } from "@/app/_types/Post";
+import { useForm, Controller } from "react-hook-form";
 
 export default function Page() {
-  const [title, setTitle] = useState("");
-  const [content, setContent] = useState("");
-  const [thumbnailUrl, setThumbnailUrl] = useState("");
-  const [categories, setCategories] = useState<Category[]>([]);
   const { id } = useParams();
   const router = useRouter();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const [categories, setCategories] = useState<Category[]>([]);
+  
+  // react-hook-formのuseFormフック
+  const { control, handleSubmit, setValue, watch } = useForm({
+    defaultValues: {
+      title: "",
+      content: "",
+      thumbnailUrl: "",
+      categories: [] as Category[], // カテゴリの型を明示
+    },
+  });
 
+  const selectedCategories = watch("categories"); // カテゴリの変更を監視
+
+  const onSubmit = async (data: any) => {
     try {
       await fetch(`/api/admin/posts/${id}`, {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
-        body: JSON.stringify({ title, content, thumbnailUrl, categories }),
+        body: JSON.stringify(data),
       });
 
       alert("記事を更新しました。");
@@ -48,16 +57,27 @@ export default function Page() {
   };
 
   useEffect(() => {
-    const fetcher = async () => {
+    const fetchPostData = async () => {
       const res = await fetch(`/api/admin/posts/${id}`);
       const { post }: { post: Post } = await res.json();
-      setTitle(post.title);
-      setContent(post.content);
-      setThumbnailUrl(post.thumbnailUrl);
-      setCategories(post.postCategories.map((pc) => pc.category));
+
+      setValue("title", post.title);
+      setValue("content", post.content);
+      setValue("thumbnailUrl", post.thumbnailUrl);
+      // postCategories から category を抽出して categories に設定
+      setValue("categories", post.postCategories.map((pc) => pc.category) as Category[]);
     };
-    fetcher();
-  }, [id]);
+    fetchPostData();
+  }, [id, setValue]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const res = await fetch("/api/admin/categories");
+      const { categories } = await res.json();
+      setCategories(categories);
+    };
+    fetchCategories();
+  }, []);
 
   return (
     <div className="container mx-auto px-4">
@@ -67,15 +87,9 @@ export default function Page() {
 
       <PostForm
         mode="edit"
-        title={title}
-        setTitle={setTitle}
-        content={content}
-        setContent={setContent}
-        thumbnailUrl={thumbnailUrl}
-        setThumbnailUrl={setThumbnailUrl}
+        control={control} // react-hook-formのcontrolを渡す
         categories={categories}
-        setCategories={setCategories}
-        onSubmit={handleSubmit}
+        onSubmit={handleSubmit(onSubmit)}
         onDelete={handleDelete}
       />
     </div>
