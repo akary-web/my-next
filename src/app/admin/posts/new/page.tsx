@@ -1,14 +1,14 @@
 
 "use client";
 
-import { useState, useEffect } from "react";
+// import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { PostForm } from "@/app/admin/posts/_components/PostForm";
-import { Category } from "@/app/_types/Categories";
+// import { Category } from "@/app/_types/Categories";
 import { useForm } from "react-hook-form";
 
 export default function Page() {
-  const [categories, setCategories] = useState<Category[]>([]);
+  // const [categories, setCategories] = useState<Category[]>([]);
   const router = useRouter();
 
   // react-hook-formのuseFormフック
@@ -40,15 +40,15 @@ export default function Page() {
     }
   };
 
-  // カテゴリの取得
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const res = await fetch("/api/admin/categories");
-      const { categories } = await res.json();
-      setCategories(categories);
-    };
-    fetchCategories();
-  }, []);
+  // // カテゴリの取得
+  // useEffect(() => {
+  //   const fetchCategories = async () => {
+  //     const res = await fetch("/api/admin/categories");
+  //     const { categories } = await res.json();
+  //     setCategories(categories);
+  //   };
+  //   fetchCategories();
+  // }, []);
 
   return (
     <div className="container mx-auto px-4">
@@ -58,10 +58,12 @@ export default function Page() {
 
       <PostForm
         mode="new"
-        control={control} // react-hook-formのcontrolを渡す
-        categories={categories}
+        control={control}
         onSubmit={handleSubmit(onSubmit)}
       />
     </div>
   );
 }
+
+// カテゴリーデータ取得を PostForm 内に統合:
+// PostForm の使用箇所で重複したデータ取得処理が不要になる。
