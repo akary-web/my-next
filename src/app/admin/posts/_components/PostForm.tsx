@@ -1,12 +1,22 @@
-import React from "react";
+"use client";
+
+import React, { useEffect, useState } from "react";
 import { Controller, UseFormReturn } from "react-hook-form";
 import { Category } from "@/app/_types/Categories";
 import { CategoriesSelect } from "./CategoriesSelect";
+import { Control } from "react-hook-form";
+
+//型の不一致のエラーを解消するため
+interface PostFormValues {
+  title: string;
+  content: string;
+  thumbnailUrl: string;
+  categories: Category[];
+}
 
 interface Props {
   mode: "new" | "edit";
-  control: UseFormReturn["control"]; // react-hook-formのcontrol
-  categories: Category[];
+  control: Control<PostFormValues>; // 型を明確に指定　
   onSubmit: (e: React.FormEvent) => void;
   onDelete?: () => void;
 }
@@ -14,10 +24,20 @@ interface Props {
 export const PostForm: React.FC<Props> = ({
   mode,
   control,
-  categories,
   onSubmit,
   onDelete,
 }) => {
+  const [categories, setCategories] = useState<Category[]>([]);
+
+  useEffect(() => {
+    const fetchCategories = async () => {
+      const res = await fetch("/api/admin/categories");
+      const { categories } = await res.json();
+      setCategories(categories);
+    };
+    fetchCategories();
+  }, []);
+
   return (
     <form onSubmit={onSubmit} className="space-y-4">
       {/* タイトル */}
@@ -34,9 +54,8 @@ export const PostForm: React.FC<Props> = ({
               <input
                 {...field}
                 id="title"
-                className={`mt-1 block w-full rounded-md border ${
-                  fieldState.error ? "border-red-500" : "border-gray-200"
-                } p-3`}
+                className={`mt-1 block w-full rounded-md border ${fieldState.error ? "border-red-500" : "border-gray-200"
+                  } p-3`}
               />
               {fieldState.error && (
                 <p className="text-red-500 text-sm mt-1">{fieldState.error.message}</p>
@@ -60,9 +79,8 @@ export const PostForm: React.FC<Props> = ({
               <textarea
                 {...field}
                 id="content"
-                className={`mt-1 block w-full rounded-md border ${
-                  fieldState.error ? "border-red-500" : "border-gray-200"
-                } p-3`}
+                className={`mt-1 block w-full rounded-md border ${fieldState.error ? "border-red-500" : "border-gray-200"
+                  } p-3`}
               />
               {fieldState.error && (
                 <p className="text-red-500 text-sm mt-1">{fieldState.error.message}</p>
@@ -86,9 +104,8 @@ export const PostForm: React.FC<Props> = ({
               <input
                 {...field}
                 id="thumbnailUrl"
-                className={`mt-1 block w-full rounded-md border ${
-                  fieldState.error ? "border-red-500" : "border-gray-200"
-                } p-3`}
+                className={`mt-1 block w-full rounded-md border ${fieldState.error ? "border-red-500" : "border-gray-200"
+                  } p-3`}
               />
               {fieldState.error && (
                 <p className="text-red-500 text-sm mt-1">{fieldState.error.message}</p>

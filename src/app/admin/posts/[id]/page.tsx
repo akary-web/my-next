@@ -1,18 +1,18 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { PostForm } from "@/app/admin/posts/_components/PostForm";
 import { Category } from "@/app/_types/Categories";
 import { Post } from "@/app/_types/Post";
-import { useForm, Controller } from "react-hook-form";
+import { useForm } from "react-hook-form";
 
 export default function Page() {
   const { id } = useParams();
   const router = useRouter();
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  
+  // const [categories, setCategories] = useState<Category[]>([]);
+
   // react-hook-formのuseFormフック
   const { control, handleSubmit, setValue, watch } = useForm({
     defaultValues: {
@@ -23,7 +23,7 @@ export default function Page() {
     },
   });
 
-  const selectedCategories = watch("categories"); // カテゴリの変更を監視
+  // const selectedCategories = watch("categories"); // カテゴリの変更を監視
 
   const onSubmit = async (data: any) => {
     try {
@@ -70,14 +70,14 @@ export default function Page() {
     fetchPostData();
   }, [id, setValue]);
 
-  useEffect(() => {
-    const fetchCategories = async () => {
-      const res = await fetch("/api/admin/categories");
-      const { categories } = await res.json();
-      setCategories(categories);
-    };
-    fetchCategories();
-  }, []);
+  // useEffect(() => {
+  //   const fetchCategories = async () => {
+  //     const res = await fetch("/api/admin/categories");
+  //     const { categories } = await res.json();
+  //     setCategories(categories);
+  //   };
+  //   fetchCategories();
+  // }, []);
 
   return (
     <div className="container mx-auto px-4">
@@ -87,11 +87,15 @@ export default function Page() {
 
       <PostForm
         mode="edit"
-        control={control} // react-hook-formのcontrolを渡す
-        categories={categories}
+        control={control}
         onSubmit={handleSubmit(onSubmit)}
         onDelete={handleDelete}
       />
+
     </div>
   );
 }
+
+// カテゴリーデータ取得を PostForm 内に統合:
+// PostForm の使用箇所で重複したデータ取得処理が不要になる。
+// mode プロパティ追加: "new" か "edit" を明示することで動作を切り替え。
