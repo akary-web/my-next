@@ -6,5 +6,12 @@ export interface Post {
   content: string
   createdAt: string
   postCategories: { category: Category }[]
-  thumbnailUrl: string
+  thumbnailImageKey: string
+}
+
+export interface PostFormValues {
+  title: string;
+  content: string;
+  thumbnailImageKey: string;
+  categories: Category[];
 }

@@ -1,57 +1,84 @@
 // 管理者_カテゴリー一覧取得API
 import { PrismaClient } from '@prisma/client'
 import { NextRequest, NextResponse } from 'next/server'
+import { supabase } from "@/app/utils/supabase";
 
-const prisma = new PrismaClient()
+const prisma = new PrismaClient() // Prismaクライアントのインスタンスを作成
 
+// GETリクエスト: カテゴリー一覧を取得するAPI
 export const GET = async (request: NextRequest) => {
   try {
-    // カテゴリーの一覧をDBから取得
+    // リクエストヘッダーから認証トークンを取得
+    const token = request.headers.get("Authorization") ?? "";
+
+    // トークンを使用してSupabaseユーザーを認証
+    const { error } = await supabase.auth.getUser(token);
+
+    // 認証エラーの場合は400ステータスを返す
+    if (error) {
+      return NextResponse.json({ state: error.message }, { status: 400 });
+    }
+
+    // データベースからカテゴリーの一覧を取得
     const categories = await prisma.category.findMany({
       orderBy: {
-        createdAt: 'desc', // 作成日時の降順で取得
+        createdAt: 'desc', // 作成日時の降順でソート
       },
-    })
+    });
 
-    // レスポンスを返す
-    return NextResponse.json({ status: 'OK', categories }, { status: 200 })
+    // 正常時のレスポンスを返す
+    return NextResponse.json({ status: 'OK', categories }, { status: 200 });
   } catch (error) {
-    if (error instanceof Error)
-      return NextResponse.json({ status: error.message }, { status: 400 })
+    // エラーハンドリング: エラー内容を400ステータスで返す
+    if (error instanceof Error) {
+      return NextResponse.json({ status: error.message }, { status: 400 });
+    }
   }
 }
 
-
 // 管理者_カテゴリー新規作成API
-// カテゴリーの作成時に送られてくるリクエストのbodyの型
+// カテゴリー作成時のリクエストボディの型
 interface CreateCategoryRequestBody {
-  name: string
+  name: string; // カテゴリー名
 }
 
-export const POST = async (request: Request, context: any) => {
+// POSTリクエスト: 新しいカテゴリーを作成するAPI
+export const POST = async (request: Request) => {
+  // リクエストヘッダーから認証トークンを取得
+  const token = request.headers.get("Authorization") ?? "";
+
+  // トークンを使用してSupabaseユーザーを認証
+  const { error } = await supabase.auth.getUser(token);
+
+  // 認証エラーの場合は400ステータスを返す
+  if (error) {
+    return NextResponse.json({ state: error.message }, { status: 400 });
+  }
+
   try {
-    // リクエストのbodyを取得
-    const body = await request.json()
+    // リクエストボディをJSON形式で取得
+    const body = await request.json();
 
-    // bodyの中からnameを取り出す
-    const { name }: CreateCategoryRequestBody = body
+    // リクエストボディからカテゴリー名を取り出す
+    const { name }: CreateCategoryRequestBody = body;
 
-    // カテゴリーをDBに生成
+    // Prismaを使用して新しいカテゴリーをデータベースに作成
     const data = await prisma.category.create({
       data: {
-        name,
+        name, // 取得したカテゴリー名を保存
       },
-    })
+    });
 
-    // レスポンスを返す
+    // 正常時のレスポンスを返す
     return NextResponse.json({
       status: 'OK',
-      message: '作成しました',
-      id: data.id,
-    })
+      message: '作成しました', // 成功メッセージ
+      id: data.id, // 作成したカテゴリーのID
+    });
   } catch (error) {
+    // エラーハンドリング: エラー内容を400ステータスで返す
     if (error instanceof Error) {
-      return NextResponse.json({ status: error.message }, { status: 400 })
+      return NextResponse.json({ status: error.message }, { status: 400 });
     }
   }
 }
