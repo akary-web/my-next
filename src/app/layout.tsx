@@ -6,8 +6,8 @@ import { Header } from "./_components/Header";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "10章課題",
-  description: "10章課題",
+  title: "11章課題",
+  description: "11章課題",
 };
 
 export default function RootLayout({
