@@ -1,13 +1,12 @@
 "use client"; // クライアントサイドで動作するコンポーネント
 
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { useParams, useRouter } from "next/navigation"; // URLパラメータやルーティングに使用
 import { PostForm } from "@/app/admin/posts/_components/PostForm"; // 投稿フォームコンポーネント
 import { Category } from "@/app/_types/Categories"; // カテゴリー型
-import { Post } from "@/app/_types/Post"; // 投稿型
 import { useForm } from "react-hook-form"; // React Hook Formのフック
 import { useSupabaseSession } from "@/app/_hooks/useSupabaseSession"; // Supabaseセッションを管理するカスタムフック
-import { PostFormValues } from "@/app/_types/Post"; // フォームの型定義
+import { Post, PostFormValues } from "@/app/_types/Post"; // フォームの型定義
 
 // 記事編集ページコンポーネント
 export default function Page() {
@@ -16,7 +15,7 @@ export default function Page() {
   const { token } = useSupabaseSession(); // Supabaseセッションからトークンを取得
 
   // React Hook Formの設定
-  const { control, handleSubmit, setValue } = useForm<PostFormValues>({
+  const { control, handleSubmit, setValue, watch } = useForm<PostFormValues>({
     defaultValues: {
       title: "", // タイトルの初期値
       content: "", // 内容の初期値
@@ -25,8 +24,8 @@ export default function Page() {
     },
   });
 
-  // サムネイル画像のキーを管理するステート
-  const [thumbnailImageKey, setThumbnailImageKey] = useState<string>("");
+  // フォーム状態からサムネイル画像キーを取得
+  const thumbnailImageKey = watch("thumbnailImageKey");
 
   // フォーム送信時の処理
   const onSubmit = async (data: PostFormValues) => {
@@ -34,7 +33,7 @@ export default function Page() {
       const body = {
         title: data.title, // フォームから取得したタイトル
         content: data.content, // フォームから取得した内容
-        thumbnailImageKey, // 現在のサムネイル画像キー
+        thumbnailImageKey, // watch を使用して取得した値
         categories: data.categories, // 選択されたカテゴリー
       };
 
@@ -50,7 +49,7 @@ export default function Page() {
 
       alert("記事を更新しました。"); // 成功メッセージ
     } catch (error) {
-      console.log("記事の更新に失敗しました。", error); // エラーメッセージを出力
+      console.error("記事の更新に失敗しました。", error); // エラーメッセージを出力
     }
   };
 
@@ -71,7 +70,7 @@ export default function Page() {
       alert("記事を削除しました。"); // 成功メッセージ
       router.push("/admin/posts"); // 投稿一覧ページにリダイレクト
     } catch (error) {
-      console.log("記事の削除に失敗しました。", error); // エラーメッセージを出力
+      console.error("記事の削除に失敗しました。", error); // エラーメッセージを出力
     }
   };
 
@@ -90,16 +89,13 @@ export default function Page() {
 
       const result = await res.json(); // APIレスポンスのボディをJSON形式で解析して、result変数に格納
 
-      // デバッグ用にレスポンスを表示
-      // console.log(result);
-
       if (result && result.post) {
         const { post }: { post: Post } = result;
 
         // フォームの値をセット
         setValue("title", post.title);
         setValue("content", post.content);
-        setThumbnailImageKey(post.thumbnailImageKey); // サムネイル画像キーをセット
+        setValue("thumbnailImageKey", post.thumbnailImageKey); // サムネイル画像キーをセット
         setValue("categories", post.postCategories.map((pc) => pc.category) as Category[]);
       } else {
         console.error("Post not found or error in fetching data"); // データ取得失敗時のエラーメッセージ
@@ -121,9 +117,14 @@ export default function Page() {
         control={control} // React Hook FormのControlを渡す
         onSubmit={handleSubmit(onSubmit)} // フォーム送信時の処理
         onDelete={handleDelete} // 削除ボタンの動作を指定
-        setThumbnailImageKey={setThumbnailImageKey} // サムネイル画像キー設定関数
-        thumbnailImageKey={thumbnailImageKey} // サムネイル画像キー
+        setThumbnailImageKey={(key) => setValue("thumbnailImageKey", key)} // サムネイル画像キー設定関数をフォームに反映
+        thumbnailImageKey={thumbnailImageKey} // フォーム状態から取得したサムネイル画像キーを渡す
       />
     </div>
   );
 }
+
+// 独立した useState を削除し、React Hook Form の watch を使って値を取得
+// サムネイル画像キーを更新する時、React Hook Form の setValue を使用
+// フォーム状態にある thumbnailImageKey をリアルタイムで取得（watchを活用）
+// setThumbnailImageKey は setValue を使う形にする（PostForm コンポーネント）
